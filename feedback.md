@@ -1,0 +1,4 @@
+- more images in motivation upfront
+- slide 10 the code block bleeds off page
+- slide 13 is too big / noisy
+- slide 14 table bleeds off screen

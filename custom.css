@@ -1,0 +1,75 @@
+/* Custom styles for MCP 101 presentation */
+
+.reveal .slides section {
+    text-align: left;
+}
+
+.reveal .slides section.center {
+    text-align: center;
+}
+
+.reveal h1, .reveal h2, .reveal h3 {
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.reveal .title-slide h1 {
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.reveal pre code {
+    font-size: 0.7em;
+    line-height: 1.2;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.reveal table {
+    font-size: 0.8em;
+    margin: 0 auto;
+}
+
+.reveal table th {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.reveal table td {
+    border-bottom: 1px solid #ddd;
+    padding: 0.5em;
+}
+
+.reveal .fragment.highlight-current-blue {
+    opacity: 1;
+    visibility: inherit;
+}
+
+.reveal .fragment.highlight-current-blue.current-fragment {
+    background: #e3f2fd;
+    padding: 0.2em;
+    border-radius: 4px;
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+    text-align: center;
+}
+
+/* Code highlighting */
+.reveal .hljs {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 1em;
+}
+
+/* Footer styling */
+.reveal .footer {
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    font-size: 0.5em;
+    color: #666;
+}

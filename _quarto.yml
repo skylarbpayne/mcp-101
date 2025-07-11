@@ -1,0 +1,39 @@
+project:
+  type: website
+
+website:
+  title: "MCP 101: Building Context-Aware AI Agents"
+  navbar: false
+
+format:
+  revealjs: 
+    theme: default
+    transition: slide
+    background-transition: fade
+    highlight-style: github
+    code-line-numbers: true
+    code-overflow: wrap
+    incremental: false
+    slide-number: c/t
+    show-slide-number: all
+    hash-type: number
+    history: false
+    controls: true
+    progress: true
+    center: true
+    touch: true
+    loop: false
+    rtl: false
+    navigation-mode: vertical
+    keyboard: true
+    overview: true
+    help: true
+    pause: true
+    embed-resources: true
+    standalone: true
+    footer: "MCP 101 - Model Context Protocol"
+    logo: ""
+    css: custom.css
+    title-slide-attributes:
+      data-background-color: "#1e1e1e"
+      data-background-size: cover
