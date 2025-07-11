@@ -1,54 +1,91 @@
 ---
-title: "MCP 101"
-subtitle: "Building the Next Generation of Context-Aware AI Agents"
-author: "Model Context Protocol Workshop"
+title: MCP 101
+subtitle: Building the Next Generation of Context-Aware AI Agents
+author: Skylar Payne
 format: revealjs
 ---
 
 ## The Dawn of Agentic AI {.center}
-
 ::: {.fragment}
 **From text generation to real-world action**
 :::
 
 ::: {.fragment}
-- AI agents can now reason, plan, and use tools
-- Microsoft Discovery: AI-discovered sustainable cooling material
-- Autonomous competitive analysis in under 50 minutes
-- HeyGen Video Agent: prompt-to-video generation
-:::
-
-::: {.fragment}
-**The paradigm shift:** Passive content creation → Active problem-solving
-:::
-
----
-
-## The Context Gap Problem {.center}
-
-::: {.fragment}
-**LLMs are "incredibly smart in a vacuum"**
+```{mermaid}
+graph TB
+    A["🧠 Traditional LLM<br/>Text Generator"] 
+    B["🤖 Agentic AI<br/>Action Taker"]
+    
+    A --> C["📝 Email Drafts"]
+    A --> D["💭 Ideas"]
+    
+    B --> E["🔍 Research"]
+    B --> F["⚙️ Tool Use"]
+    B --> G["🎯 Goal Achievement"]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#9f9,stroke:#333,stroke-width:2px
+```
 :::
 
 ::: {.columns}
 
-::: {.column width="50%"}
-### The Challenges
-- **Knowledge Cutoff**: Frozen training data
-- **Data Silos**: No access to private/real-time data  
-- **N×M Integration**: Every model needs custom connections
+<!--
+FIXME: These examples I'm not sure are real... They sound hallucinated.
+-->
+::: {.column width="50%" .fragment}
+- 🤖 AI agents can now reason, plan, and use tools
+- 🔬 Microsoft Discovery: AI-discovered sustainable cooling material
 :::
+
+::: {.column width="50%" .fragment}
+- 📊 Autonomous competitive analysis in under 50 minutes
+- 🎥 HeyGen Video Agent: prompt-to-video generation
+:::
+
+<!--
+FIXME: This flows off the page.
+-->
+::: {.fragment}
+**The paradigm shift:** Passive content creation → Active problem-solving
+:::
+
+:::
+
+## {.center}
+
+## The Context Gap Problem {.center}
+
+::: {.fragment}
+**LLMs are "incredibly smart in a vacuum"** 🎈
+:::
+
+<!--
+FIXME: This slide feels cluttered. Needs more white space to make it more readable.
+Both between the columns and between the bullet points
+-->
+::: {.columns}
 
 ::: {.column width="50%"}
-### The Impact
-- 80% of AI projects fail due to data access issues
-- Complex "context engineering" required
-- Vendor lock-in and brittle integrations
+### 🚧 The Challenges
+- **⏳ Knowledge Cutoff**: Frozen training data
+- **🏝️ Data Silos**: No access to private/real-time data  
+- **🕸️ N×M Integration**: Every model needs custom connections
+:::
+
+<!--
+FIXME: the 80% stat seems hallucinated.
+-->
+::: {.column width="50%"}
+### 💥 The Impact
+- 📉 80% of AI projects fail due to data access
+- 🧩 Complex "context engineering" required
+- 🔒 Vendor lock-in and brittle integrations
 :::
 
 :::
 
----
+## {.center}
 
 ## Integration: Before vs After MCP
 
@@ -60,8 +97,10 @@ format: revealjs
 | **Security** | Ad-hoc API key management | OAuth 2.1, scopes, consent |
 | **Scalability** | Poor: N×M complexity | Excellent: N+M complexity |
 
----
-
+<!--
+FIXME: this slide feels unnecessary honestly. Can possibly be removed.
+Maybe just add "MCP: The USB C for AI" to the previous slide above the table?
+-->
 ## Meet MCP: The Universal Standard {.center}
 
 ::: {.fragment}
@@ -85,7 +124,7 @@ format: revealjs
 
 :::
 
----
+## {.center}
 
 ## MCP Architecture {.center}
 
@@ -108,8 +147,6 @@ graph TD
 - **Client**: Manages connections (1:1 with servers)
 - **Server**: Exposes specific capabilities via JSON-RPC 2.0
 
----
-
 ## Our Demo: AI Research Assistant {.center}
 
 ::: {.fragment}
@@ -125,7 +162,11 @@ graph TD
 5. **Advanced**: Elicitation, Roots, and Sampling
 :::
 
----
+## {.center}
+
+<!--
+FIXME: we should have a placeholder here for a live demo of the system before we get into showing how it is built.
+-->
 
 ## Step 1: Scaffolding the ArXiv Server
 
@@ -134,10 +175,7 @@ graph TD
 ::: {.column width="40%"}
 ### Setup
 ```bash
-uv init arxiv-assistant
-uv venv
-source .venv/bin/activate
-uv add "mcp[cli]" arxiv
+uv sync
 ```
 :::
 
@@ -152,7 +190,6 @@ mcp = FastMCP("ArXiv Research Server")
 @mcp.tool()
 def search_papers(query: str, max_results: int = 5):
     """Search ArXiv for scientific papers"""
-    # Implementation here
     pass
 ```
 :::
@@ -160,10 +197,10 @@ def search_papers(query: str, max_results: int = 5):
 :::
 
 ::: {.fragment}
-**Run and test**: `uv run python server.py`
+**Run and test**: `uv run uvicorn server:mcp --reload`
 :::
 
----
+## {.center}
 
 ## MCP's Three Core Primitives {.center}
 
@@ -177,49 +214,62 @@ def search_papers(query: str, max_results: int = 5):
 **Benefits**: Clear separation of concerns, better security, predictable behavior
 :::
 
----
+## {.center}
 
 ## Code Demo: Complete ArXiv Server
 
+::: {.columns}
+
+<!--
+FIXME: split these two code blocks into two separate slides.
+-->
+::: {.column width="50%"}
+**Setup & Models**
 ```python
 from mcp.server.fastmcp import FastMCP
 import arxiv
 from pydantic import BaseModel
 
-mcp = FastMCP("ArXiv Research Server", port=8002)
+mcp = FastMCP("ArXiv Research Server")
 
 class Paper(BaseModel):
     title: str
     authors: list[str]
     summary: str
     pdf_url: str
+```
+:::
 
+::: {.column width="50%"}
+**Tools & Resources**
+```python
 @mcp.tool()
-def search_papers(query: str, max_results: int = 5) -> list[Paper]:
-    """Searches ArXiv database for scientific papers"""
-    search = arxiv.Search(query=query, max_results=max_results)
-    results = []
-    for r in search.results():
-        results.append(Paper(
-            title=r.title,
-            authors=[author.name for author in r.authors],
-            summary=r.summary,
-            pdf_url=r.pdf_url,
-        ))
-    return results
+def search_papers(query: str, max_results: int = 5):
+    """Search ArXiv for papers"""
+    search = arxiv.Search(query=query, 
+                         max_results=max_results)
+    return [Paper(...) for r in search.results()]
 
 @mcp.resource("arxiv/{paper_id}/abstract")
 def get_abstract(paper_id: str) -> str:
-    """Get the abstract of a specific paper"""
+    """Get paper abstract"""
     # Implementation here
     pass
-
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
 ```
+:::
 
----
+:::
 
+::: {.fragment}
+**Full implementation**: See `examples/arxiv-server/server.py`
+:::
+
+## {.center}
+
+<!--
+FIXME: there's too much text on this slide to see the code. Better to just show the code with minimal setup
+But still keep SOME intro text.
+-->
 ## Enhanced UX: Progress Tracking
 
 ::: {.columns}
@@ -252,9 +302,9 @@ if __name__ == "__main__":
   }
 }
 ```
-
----
-
+<!--
+FIXME: I doubt the correctness/authenticity of this slide.
+-->
 ## Security: OAuth 2.1 Authentication
 
 ::: {.fragment}
@@ -284,7 +334,7 @@ if __name__ == "__main__":
 **Result**: Most secure path is also the easiest path
 :::
 
----
+## {.center}
 
 ## Authentication Flow
 
@@ -307,68 +357,73 @@ sequenceDiagram
     Server->>Client: Success!
 ```
 
----
+<!--
+FIXME: we need a code example to actually connect with Zotero...
+-->
 
+<!--
+FIXME: I think it would be nice to use cards here with better margins/padding to create space in the content
+-->
 ## Advanced Interactive Patterns
 
 ::: {.columns}
 
-::: {.column width="33%"}
-### Elicitation
-**Runtime user input**
+::: {.column width="50%"}
+### 🗣️ Elicitation
+Ask users for clarification when needed
 
-```json
-{
-  "message": "Which transformers?",
-  "requestedSchema": {
-    "topic": {
-      "enum": ["ai_models", "electrical"]
-    }
-  }
-}
-```
+**Example**: "Which 'transformers'?" 
+- AI models or electrical engineering?
 :::
 
-::: {.column width="33%"}
-### Roots
-**Security boundaries**
-
-```
-file:///Users/researcher/
-  AI_Papers_Project/
-```
-
-Prevents access outside designated directories
-:::
-
-::: {.column width="33%"}
-### Sampling
-**Server requests LLM**
-
-Server asks client's LLM to summarize content or analyze data
+::: {.column width="50%"}
+### 🔒 Security Features
+- **Roots**: Filesystem boundaries
+- **Sampling**: Server can request LLM help
+- **Scopes**: Granular permissions
 :::
 
 :::
 
----
+::: {.fragment}
+**Key benefit**: Human-in-the-loop workflows with graceful ambiguity handling
+:::
+
+## {.center}
 
 ## The Growing MCP Ecosystem
 
-| Category | Examples | Capabilities |
-|----------|----------|-------------|
-| **Developer Tools** | GitHub, GitLab, Docker, Playwright | Code management, CI/CD, automation |
-| **Databases** | PostgreSQL, Redis, Vector DBs | Structured data, embeddings, caching |
-| **Communication** | Slack, Gmail, Teams | Messaging, email, calendar |
-| **Productivity** | Google Drive, Notion, Zotero | Files, documents, references |
-| **Web Search** | Brave, DuckDuckGo, Tavily | Real-time search and data |
-| **Aggregators** | Zapier, Pipedream | Thousands of SaaS integrations |
+::: {.columns}
 
----
+::: {.column width="50%"}
+### 🛠️ Popular Categories
+- **Developer Tools**: GitHub, GitLab, Docker
+- **Databases**: PostgreSQL, Redis, Vector DBs  
+- **Communication**: Slack, Gmail, Teams
+:::
+
+::: {.column width="50%"}
+### 🚀 What They Enable
+- **Productivity**: Google Drive, Notion, Zotero
+- **Web Search**: Brave, DuckDuckGo, Tavily
+- **Aggregators**: Zapier (1000s of integrations)
+:::
+
+:::
+
+::: {.fragment}
+**200+ servers and growing** - Build once, use everywhere
+:::
+
+## {.center}
 
 ## Getting Started: Developer Resources
 
 ::: {.columns}
 
+<!--
+FIXME: these need actual links.
+-->
 ::: {.column width="50%"}
 ### Essential Resources
 - **Official Docs**: modelcontextprotocol.io
@@ -387,8 +442,11 @@ Server asks client's LLM to summarize content or analyze data
 
 :::
 
----
+## {.center}
 
+<!--
+FIXME: I pointed out somewhere above we should start with a live demo of the system before we get into showing how it is built; so this should be moved there.
+-->
 ## Demo Time! {.center}
 
 ::: {.fragment}
@@ -402,7 +460,7 @@ Server asks client's LLM to summarize content or analyze data
 4. Generate a summary with progress tracking
 :::
 
----
+## {.center}
 
 ## The Future is Composable {.center}
 
@@ -428,7 +486,7 @@ Server asks client's LLM to summarize content or analyze data
 **The time to start building is now.**
 :::
 
----
+## {.center}
 
 ## Questions & Discussion {.center}
 

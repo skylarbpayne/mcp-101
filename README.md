@@ -35,9 +35,12 @@ quarto render
 
 ```bash
 cd examples/arxiv-server
-uv venv && source .venv/bin/activate
-uv add -r requirements.txt
-uv run python server.py
+uv sync
+uv run arxiv-server
+
+# In another terminal, run the example client:
+uv sync --extra client
+uv run python client_example.py
 ```
 
 ## 📖 Presentation Outline

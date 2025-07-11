@@ -8,10 +8,9 @@ demonstrating Tools, Resources, and progress notifications.
 
 import asyncio
 import arxiv
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel
 from mcp.server.fastmcp import FastMCP
-from mcp.types import TextContent, EmbeddedResource
 
 # Initialize the MCP server
 mcp = FastMCP("ArXiv Research Server")
@@ -85,7 +84,6 @@ async def download_paper_collection(query: str, max_papers: int = 10) -> dict:
     Returns:
         Dictionary with download results and file paths
     """
-    import os
     from pathlib import Path
     
     # Create download directory
@@ -221,10 +219,14 @@ You are an AI research assistant. Follow this workflow to analyze a research pap
 Please be thorough but concise in your analysis.
     """.strip()
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the ArXiv MCP server."""
     # Run the server
     mcp.run(
         transport="stdio",  # Use stdio for local development
         # transport="streamable-http",  # Use HTTP for remote access
         # port=8002
     )
+
+if __name__ == "__main__":
+    main()

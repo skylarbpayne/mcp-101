@@ -22,23 +22,24 @@ A demonstration Model Context Protocol (MCP) server that provides access to the 
 # Clone or navigate to this directory
 cd examples/arxiv-server
 
-# Create virtual environment
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Install dependencies with uv (creates venv automatically)
+uv sync
 
-# Install dependencies
-uv add -r requirements.txt
+# Or for development with additional tools
+uv sync --extra dev
 ```
 
 ### Running the Server
 
 ```bash
 # For local development (stdio transport)
+uv run arxiv-server
+
+# Or directly with python
 uv run python server.py
 
 # For remote access (HTTP transport)
-# Uncomment the HTTP transport lines in server.py, then:
-uv run python server.py
+# Uncomment the HTTP transport lines in server.py, then run above
 ```
 
 ### Testing with MCP Inspector
@@ -47,6 +48,25 @@ uv run python server.py
 # In another terminal
 uv run mcp dev server.py
 ```
+
+### Running the Example Client
+
+A complete client example is provided to demonstrate MCP interaction:
+
+```bash
+# Install client dependencies
+uv sync --extra client
+
+# Run the example client (make sure server is running in another terminal)
+uv run python client_example.py
+```
+
+The client will:
+- Connect to the ArXiv server
+- List available capabilities
+- Search for papers on "quantum computing"
+- Retrieve paper details
+- Show the analysis prompt template
 
 ## Available Capabilities
 
