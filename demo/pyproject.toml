@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arxiv-research-demo"
+version = "0.1.0"
+description = "Demo combining ArXiv search, extraction, and GitHub gist creation"
+authors = [
+    {name = "Research Demo", email = "demo@example.com"},
+]
+requires-python = ">=3.8"
+dependencies = [
+    "arxiv>=2.1.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.0.0",
+    "typer>=0.9.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+]
+
+[project.scripts]
+arxiv-demo = "arxiv_research_demo.demo:main"
