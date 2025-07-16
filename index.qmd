@@ -76,7 +76,7 @@ graph TD
     A[MCP Host<br/>Claude Desktop, Cursor IDE] --> B[MCP Client 1]
     A --> C[MCP Client 2]
     A --> D[MCP Client N]
-    B --> E[ArXiv Server]
+    B --> E[OAuth Research Server]
     C --> F[GitHub Server]
     D --> G[Database Server]
     
@@ -101,65 +101,110 @@ graph TD
 :::
 
 ::: {.incremental}
-1. **Scaffold**: Basic ArXiv search server
+1. **Scaffold**: Basic OAuth server with GitHub integration
 2. **Expand**: Add Tools, Resources, and Prompts
-3. **Enhance**: Progress notifications and logging
-4. **Secure**: OAuth authentication with Zotero
-5. **Advanced**: Elicitation, Roots, and Sampling
+3. **Enhance**: OAuth 2.1 + PKCE authentication
+4. **Secure**: Protected tools requiring GitHub OAuth
+5. **Advanced**: Token management and dynamic client registration
 :::
 
 ## Demo Time! {.center}
 
 ::: {.fragment}
-**Let's see our AI Research Assistant in action**
+**Let's see our OAuth Research Assistant in action**
 :::
 
 ::: {.fragment}
-1. Search for papers on "transformer models"
-2. Download a specific paper  
-3. Save it to Zotero library
-4. Generate a summary with progress tracking
+1. Register OAuth client with MCP server
+2. Authenticate with GitHub via OAuth 2.1 + PKCE
+3. Save research papers to GitHub repositories
+4. List and manage research repositories
 :::
 
-## Step 1: Scaffolding the ArXiv Server
+## Step 1: OAuth Research Server Setup
 
 ::: {.columns}
 
 ::: {.column width="40%"}
 ### Setup
 ```bash
-uv sync
+# Set GitHub OAuth credentials
+export GITHUB_CLIENT_ID="your_id"
+export GITHUB_CLIENT_SECRET="your_secret"
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 :::
 
 ::: {.column width="60%"}
-### Simple Server
+### OAuth Server
 ```python
+from fastapi import HTTPException
 from mcp.server.fastmcp import FastMCP
-import arxiv
 
-mcp = FastMCP("ArXiv Research Server")
+mcp = FastMCP("OAuth Research Server")
+
+@mcp.get("/.well-known/oauth-authorization-server")
+async def oauth_metadata():
+    return {
+        "authorization_endpoint": "http://localhost:8002/oauth/authorize",
+        "token_endpoint": "http://localhost:8002/oauth/token"
+    }
 
 @mcp.tool()
-def search_papers(query: str, max_results: int = 5):
-    """Search ArXiv for scientific papers"""
-    pass
+async def save_paper_to_github(paper_title: str, repo_name: str):
+    """Save research paper to GitHub (OAuth required)"""
+    auth_context = get_auth_context()
+    if not auth_context.get("bearer"):
+        raise HTTPException(status_code=401, detail="OAuth required")
+    
+    # Create GitHub repository with OAuth token
+    return {"status": "saved", "repo_url": f"https://github.com/user/{repo_name}"}
+
+mcp.run(transport="http", port=8002)
 ```
 :::
 
 :::
 
 ::: {.fragment}
-**Run and test**: `uv run uvicorn server:mcp --reload`
+**Run and test**: `python oauth_server.py`
 :::
+
+## OAuth 2.1 Flow Implementation
+
+```{mermaid}
+sequenceDiagram
+    participant Client as MCP Client
+    participant Server as OAuth Server
+    participant GitHub as GitHub OAuth
+    participant API as GitHub API
+
+    Client->>Server: 1. Register Client (Dynamic)
+    Server-->>Client: Client ID & Secret
+    
+    Client->>Server: 2. Request Authorization
+    Server->>GitHub: 3. Redirect to GitHub OAuth
+    GitHub->>Server: 4. Authorization Code
+    Server->>GitHub: 5. Exchange Code for Token
+    GitHub-->>Server: GitHub Access Token
+    Server-->>Client: 6. MCP Access Token
+    
+    Client->>Server: 7. Call Protected Tool
+    Note over Server: Bearer Token Required
+    Server->>API: 8. GitHub API Call
+    API-->>Server: Repository Created
+    Server-->>Client: Success Response
+```
 
 ## MCP's Three Core Primitives {.center}
 
 | Primitive | Purpose | Analogy | Example |
 |-----------|---------|---------|---------|
-| **Tools** | Executable actions with side effects | POST Request | `download_paper(paper_id)` |
-| **Resources** | Read-only, file-like data | GET Request | `arxiv/{paper_id}/abstract` |
-| **Prompts** | Reusable workflow templates | Workflow | "Deep Paper Analysis" |
+| **Tools** | Executable actions with side effects | POST Request | `save_paper_to_github(title, repo_name)` |
+| **Resources** | Read-only, file-like data | GET Request | `github/repos/{repo_name}/readme` |
+| **Prompts** | Reusable workflow templates | Workflow | "OAuth Paper Management" |
 
 ::: {.fragment}
 **Benefits**: Clear separation of concerns, better security, predictable behavior
@@ -169,47 +214,61 @@ def search_papers(query: str, max_results: int = 5):
 
 ```python
 from mcp.server.fastmcp import FastMCP
-import arxiv
+from fastapi import HTTPException
+import httpx
 from pydantic import BaseModel
 
-mcp = FastMCP("ArXiv Research Server")
+mcp = FastMCP("OAuth Research Server")
 
-class Paper(BaseModel):
-    title: str
-    authors: list[str]
-    summary: str
-    pdf_url: str
+class GitHubRepository(BaseModel):
+    name: str
+    full_name: str
+    description: str
+    html_url: str
+    created_at: str
 ```
 
 ## Code Demo: Tools Implementation
 
 ```python
 @mcp.tool()
-def search_papers(query: str, max_results: int = 5):
-    """Search ArXiv for papers"""
-    search = arxiv.Search(query=query, 
-                         max_results=max_results)
-    return [Paper(...) for r in search.results()]
+async def save_paper_to_github(paper_title: str, repo_name: str):
+    """Save research paper to GitHub (OAuth required)"""
+    auth_context = get_auth_context()
+    if not auth_context.get("bearer"):
+        raise HTTPException(status_code=401, detail="OAuth required")
+    
+    # Use GitHub API with OAuth token
+    token_info = access_tokens[auth_context["bearer"]]
+    github_token = token_info["github_token"]
+    
+    # Create repository via GitHub API
+    return {"status": "saved", "repo_url": f"https://github.com/user/{repo_name}"}
 ```
 
 ## Code Demo: Resources Implementation
 
 ```python
-@mcp.resource("arxiv/{paper_id}/abstract")
-def get_abstract(paper_id: str) -> str:
-    """Get paper abstract"""
-    paper = arxiv.Search(id_list=[paper_id]).results()[0]
-    return paper.summary
-
-@mcp.resource("arxiv/{paper_id}/full_text")  
-def get_full_text(paper_id: str) -> str:
-    """Get paper full text"""
-    # Download and extract text from PDF
-    pass
+@mcp.resource("github/repos/{repo_name}/readme")
+async def get_repo_readme(repo_name: str) -> str:
+    """Get repository README (OAuth required)"""
+    auth_context = get_auth_context()
+    if not auth_context.get("bearer"):
+        raise HTTPException(status_code=401, detail="OAuth required")
+    
+    # Fetch README from GitHub API
+    github_token = access_tokens[auth_context["bearer"]]["github_token"]
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"https://api.github.com/repos/{repo_name}/readme",
+            headers={"Authorization": f"Bearer {github_token}"}
+        )
+        return response.json()["content"]
 ```
 
 ::: {.fragment}
-**Full implementation**: See `examples/arxiv-server/server.py`
+**Full implementation**: See `examples/oauth-research-server/oauth_server.py`
 :::
 
 ## Enhanced UX: Progress Tracking
