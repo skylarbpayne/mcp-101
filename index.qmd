@@ -209,7 +209,7 @@ def get_full_text(paper_id: str) -> str:
 ```
 
 ::: {.fragment}
-**Full implementation**: See `examples/arxiv-server/server.py`
+**Full implementation**: See `examples/oauth-research-server/server.py`
 :::
 
 ## Enhanced UX: Progress Tracking
@@ -369,7 +369,7 @@ async def save_paper_to_github(paper_id: str, repo_name: str):
 :::
 
 ::: {.fragment}
-**Demo Files**: `examples/oauth-research-server/oauth_server_fixed.py` - Correct MCP OAuth
+**Demo Files**: `examples/oauth-research-server/server.py` - Simple correct MCP OAuth
 :::
 
 ## Advanced Interactive Patterns
