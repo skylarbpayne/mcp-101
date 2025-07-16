@@ -28,31 +28,10 @@ graph TB
 ```
 :::
 
-::: {.columns}
-
-<!--
-FIXME: These examples I'm not sure are real... They sound hallucinated.
--->
-::: {.column width="50%" .fragment}
-- 🤖 AI agents can now reason, plan, and use tools
-- 🔬 Microsoft Discovery: AI-discovered sustainable cooling material
-:::
-
-::: {.column width="50%" .fragment}
-- 📊 Autonomous competitive analysis in under 50 minutes
-- 🎥 HeyGen Video Agent: prompt-to-video generation
-:::
-
-<!--
-FIXME: This flows off the page.
--->
 ::: {.fragment}
-**The paradigm shift:** Passive content creation → Active problem-solving
+**The paradigm shift:**  
+Passive content creation → Active problem-solving
 :::
-
-:::
-
-## {.center}
 
 ## The Context Gap Problem {.center}
 
@@ -60,34 +39,27 @@ FIXME: This flows off the page.
 **LLMs are "incredibly smart in a vacuum"** 🎈
 :::
 
-<!--
-FIXME: This slide feels cluttered. Needs more white space to make it more readable.
-Both between the columns and between the bullet points
--->
 ::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="45%"}
 ### 🚧 The Challenges
-- **⏳ Knowledge Cutoff**: Frozen training data
+
+- **⏳ Knowledge Cutoff**: Frozen training data  
 - **🏝️ Data Silos**: No access to private/real-time data  
-- **🕸️ N×M Integration**: Every model needs custom connections
+- **🕸️ N×M Integration**: Every model needs custom connections  
 :::
 
-<!--
-FIXME: the 80% stat seems hallucinated.
--->
-::: {.column width="50%"}
+::: {.column width="45%" .mb-4}
 ### 💥 The Impact
-- 📉 80% of AI projects fail due to data access
-- 🧩 Complex "context engineering" required
-- 🔒 Vendor lock-in and brittle integrations
+
+- 📉 80% of AI projects fail (RAND Corp, 2024)  
+- 🧩 Complex "context engineering" required  
+- 🔒 Vendor lock-in and brittle integrations  
 :::
 
 :::
 
-## {.center}
-
-## Integration: Before vs After MCP
+## MCP: The USB-C for AI {.center}
 
 | Aspect | Traditional (N×M) | MCP Standard |
 |--------|------------------|--------------|
@@ -96,35 +68,6 @@ FIXME: the 80% stat seems hallucinated.
 | **Interoperability** | Vendor-locked | Model-agnostic open standard |
 | **Security** | Ad-hoc API key management | OAuth 2.1, scopes, consent |
 | **Scalability** | Poor: N×M complexity | Excellent: N+M complexity |
-
-<!--
-FIXME: this slide feels unnecessary honestly. Can possibly be removed.
-Maybe just add "MCP: The USB C for AI" to the previous slide above the table?
--->
-## Meet MCP: The Universal Standard {.center}
-
-::: {.fragment}
-**Model Context Protocol** - *Anthropic, November 2024*
-:::
-
-::: {.columns}
-
-::: {.column width="50%"}
-### Key Analogies
-- **"USB-C for AI"**: Universal connector for AI peripherals
-- **"LSP for AI"**: Like Language Server Protocol for editors
-:::
-
-::: {.column width="50%"}
-### Core Benefits
-- Open, model-agnostic standard
-- Network effects: build once, use everywhere
-- Future-proof architecture
-:::
-
-:::
-
-## {.center}
 
 ## MCP Architecture {.center}
 
@@ -155,6 +98,9 @@ graph TD
 
 ::: {.fragment}
 ### Implementation Plan
+:::
+
+::: {.incremental}
 1. **Scaffold**: Basic ArXiv search server
 2. **Expand**: Add Tools, Resources, and Prompts
 3. **Enhance**: Progress notifications and logging
@@ -162,11 +108,18 @@ graph TD
 5. **Advanced**: Elicitation, Roots, and Sampling
 :::
 
-## {.center}
+## Demo Time! {.center}
 
-<!--
-FIXME: we should have a placeholder here for a live demo of the system before we get into showing how it is built.
--->
+::: {.fragment}
+**Let's see our AI Research Assistant in action**
+:::
+
+::: {.fragment}
+1. Search for papers on "transformer models"
+2. Download a specific paper  
+3. Save it to Zotero library
+4. Generate a summary with progress tracking
+:::
 
 ## Step 1: Scaffolding the ArXiv Server
 
@@ -200,8 +153,6 @@ def search_papers(query: str, max_results: int = 5):
 **Run and test**: `uv run uvicorn server:mcp --reload`
 :::
 
-## {.center}
-
 ## MCP's Three Core Primitives {.center}
 
 | Primitive | Purpose | Analogy | Example |
@@ -214,17 +165,8 @@ def search_papers(query: str, max_results: int = 5):
 **Benefits**: Clear separation of concerns, better security, predictable behavior
 :::
 
-## {.center}
+## Code Demo: Setup & Models
 
-## Code Demo: Complete ArXiv Server
-
-::: {.columns}
-
-<!--
-FIXME: split these two code blocks into two separate slides.
--->
-::: {.column width="50%"}
-**Setup & Models**
 ```python
 from mcp.server.fastmcp import FastMCP
 import arxiv
@@ -238,10 +180,9 @@ class Paper(BaseModel):
     summary: str
     pdf_url: str
 ```
-:::
 
-::: {.column width="50%"}
-**Tools & Resources**
+## Code Demo: Tools Implementation
+
 ```python
 @mcp.tool()
 def search_papers(query: str, max_results: int = 5):
@@ -249,62 +190,52 @@ def search_papers(query: str, max_results: int = 5):
     search = arxiv.Search(query=query, 
                          max_results=max_results)
     return [Paper(...) for r in search.results()]
+```
 
+## Code Demo: Resources Implementation
+
+```python
 @mcp.resource("arxiv/{paper_id}/abstract")
 def get_abstract(paper_id: str) -> str:
     """Get paper abstract"""
-    # Implementation here
+    paper = arxiv.Search(id_list=[paper_id]).results()[0]
+    return paper.summary
+
+@mcp.resource("arxiv/{paper_id}/full_text")  
+def get_full_text(paper_id: str) -> str:
+    """Get paper full text"""
+    # Download and extract text from PDF
     pass
 ```
-:::
-
-:::
 
 ::: {.fragment}
 **Full implementation**: See `examples/arxiv-server/server.py`
 :::
 
-## {.center}
-
-<!--
-FIXME: there's too much text on this slide to see the code. Better to just show the code with minimal setup
-But still keep SOME intro text.
--->
 ## Enhanced UX: Progress Tracking
 
-::: {.columns}
+**Problem**: Long-running operations need user feedback
 
-::: {.column width="50%"}
-### The Problem
-- Long-running operations leave users waiting
-- No feedback during downloads or processing
-- Poor user experience
-:::
+**Solution**: MCP's built-in notification system
 
-::: {.column width="50%"}
-### MCP Solution
-- Built-in notification system
-- Progress tokens for tracking
-- Real-time status updates
-:::
-
-:::
-
-### Implementation
-```json
-{
-  "method": "notifications/progress",
-  "params": {
-    "progressToken": "download-xyz-789",
-    "progress": 5,
-    "total": 20,
-    "message": "Downloading paper 5 of 20..."
-  }
-}
+```python
+@mcp.tool()
+def download_papers(paper_ids: list[str], progress_token: str):
+    """Download multiple papers with progress tracking"""
+    total = len(paper_ids)
+    
+    for i, paper_id in enumerate(paper_ids):
+        # Send progress notification
+        mcp.request_context.session.send_progress_notification(
+            progress_token=progress_token,
+            progress=i + 1,
+            total=total,
+            message=f"Downloading paper {i + 1} of {total}..."
+        )
+        
+        # Download paper
+        download_single_paper(paper_id)
 ```
-<!--
-FIXME: I doubt the correctness/authenticity of this slide.
--->
 ## Security: OAuth 2.1 Authentication
 
 ::: {.fragment}
@@ -334,8 +265,6 @@ FIXME: I doubt the correctness/authenticity of this slide.
 **Result**: Most secure path is also the easiest path
 :::
 
-## {.center}
-
 ## Authentication Flow
 
 ```{mermaid}
@@ -357,30 +286,62 @@ sequenceDiagram
     Server->>Client: Success!
 ```
 
-<!--
-FIXME: we need a code example to actually connect with Zotero...
--->
+## Zotero Integration Code Example
 
-<!--
-FIXME: I think it would be nice to use cards here with better margins/padding to create space in the content
--->
+```python
+from pyzotero import zotero
+
+@mcp.tool()
+def add_paper_to_zotero(paper_id: str, collection_key: str = None):
+    """Add ArXiv paper to Zotero library"""
+    # Get paper details from ArXiv
+    paper = arxiv.Search(id_list=[paper_id]).results()[0]
+    
+    # Initialize Zotero client (requires OAuth token)
+    zot = zotero.Zotero(
+        library_id=user_library_id,
+        library_type='user', 
+        api_key=oauth_token
+    )
+    
+    # Create Zotero item
+    item = {
+        'itemType': 'preprint',
+        'title': paper.title,
+        'creators': [{'name': str(author), 'creatorType': 'author'} 
+                    for author in paper.authors],
+        'abstractNote': paper.summary,
+        'url': paper.entry_id,
+        'repository': 'arXiv'
+    }
+    
+    # Add to Zotero
+    return zot.create_items([item])
+```
+
 ## Advanced Interactive Patterns
 
 ::: {.columns}
 
 ::: {.column width="50%"}
+::: {style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;"}
 ### 🗣️ Elicitation
+
 Ask users for clarification when needed
 
-**Example**: "Which 'transformers'?" 
+**Example**: "Which 'transformers'?"  
 - AI models or electrical engineering?
+:::
 :::
 
 ::: {.column width="50%"}
+::: {style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;"}
 ### 🔒 Security Features
-- **Roots**: Filesystem boundaries
-- **Sampling**: Server can request LLM help
+
+- **Roots**: Filesystem boundaries  
+- **Sampling**: Server can request LLM help  
 - **Scopes**: Granular permissions
+:::
 :::
 
 :::
@@ -388,8 +349,6 @@ Ask users for clarification when needed
 ::: {.fragment}
 **Key benefit**: Human-in-the-loop workflows with graceful ambiguity handling
 :::
-
-## {.center}
 
 ## The Growing MCP Ecosystem
 
@@ -415,18 +374,13 @@ Ask users for clarification when needed
 **200+ servers and growing** - Build once, use everywhere
 :::
 
-## {.center}
-
 ## Getting Started: Developer Resources
 
 ::: {.columns}
 
-<!--
-FIXME: these need actual links.
--->
 ::: {.column width="50%"}
 ### Essential Resources
-- **Official Docs**: modelcontextprotocol.io
+- **Official Docs**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 - **Protocol Spec**: Complete technical specification
 - **SDKs**: Python, TypeScript, Java, C#, Go
 - **MCP Inspector**: Interactive debugging tool
@@ -434,33 +388,13 @@ FIXME: these need actual links.
 
 ::: {.column width="50%"}
 ### Learning & Community
-- **DeepLearning.AI Course**: Structured tutorials
-- **awesome-mcp-servers**: Curated examples
-- **Community**: Reddit r/mcp, Discord servers
+- **DeepLearning.AI Course**: [Build Rich-Context AI Apps](https://www.deeplearning.ai/short-courses/mcp-build-rich-context-ai-apps-with-anthropic/)
+- **awesome-mcp-servers**: [GitHub Collection](https://github.com/punkpeye/awesome-mcp-servers)
+- **Community**: [MCP Servers Directory](https://mcpservers.org)
 - **Quick Start**: Build your first server in minutes
 :::
 
 :::
-
-## {.center}
-
-<!--
-FIXME: I pointed out somewhere above we should start with a live demo of the system before we get into showing how it is built; so this should be moved there.
--->
-## Demo Time! {.center}
-
-::: {.fragment}
-**Let's see our AI Research Assistant in action**
-:::
-
-::: {.fragment}
-1. Search for papers on "transformer models"
-2. Download a specific paper
-3. Save it to Zotero library
-4. Generate a summary with progress tracking
-:::
-
-## {.center}
 
 ## The Future is Composable {.center}
 
@@ -486,8 +420,6 @@ FIXME: I pointed out somewhere above we should start with a live demo of the sys
 **The time to start building is now.**
 :::
 
-## {.center}
-
 ## Questions & Discussion {.center}
 
 ::: {.fragment}
@@ -497,8 +429,8 @@ FIXME: I pointed out somewhere above we should start with a live demo of the sys
 ::: {.fragment}
 ### Resources
 - **Demo Code**: Available in this repository
-- **Documentation**: modelcontextprotocol.io
-- **Community**: Join the MCP ecosystem
+- **Documentation**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **Community**: [MCP Servers Directory](https://mcpservers.org)
 :::
 
 ::: {.fragment}
