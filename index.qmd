@@ -104,7 +104,7 @@ graph TD
 1. **Scaffold**: Basic ArXiv search server
 2. **Expand**: Add Tools, Resources, and Prompts
 3. **Enhance**: Progress notifications and logging
-4. **Secure**: OAuth authentication with Zotero
+4. **Secure**: OAuth 2.1 authentication with GitHub
 5. **Advanced**: Elicitation, Roots, and Sampling
 :::
 
@@ -117,8 +117,8 @@ graph TD
 ::: {.fragment}
 1. Search for papers on "transformer models"
 2. Download a specific paper  
-3. Save it to Zotero library
-4. Generate a summary with progress tracking
+3. Save it to GitHub repository with OAuth 2.1
+4. Create research gists with progress tracking
 :::
 
 ## Step 1: Scaffolding the ArXiv Server
@@ -239,7 +239,7 @@ def download_papers(paper_ids: list[str], progress_token: str):
 ## Security: OAuth 2.1 Authentication
 
 ::: {.fragment}
-**Challenge**: Access private Zotero library safely
+**Challenge**: Access GitHub API safely with proper authentication
 :::
 
 ::: {.columns}
@@ -271,53 +271,98 @@ def download_papers(paper_ids: list[str], progress_token: str):
 sequenceDiagram
     participant User
     participant Client
-    participant Server
-    participant Zotero
+    participant MCP Server
+    participant GitHub
     
-    User->>Client: "Save paper to Zotero"
-    Client->>Server: add_paper_to_collection()
-    Server-->>Client: 401 Unauthorized
-    Client->>Zotero: OAuth authorization request
-    Zotero->>User: Login & consent screen
-    User->>Zotero: Approve access
-    Zotero->>Client: Authorization code
-    Client->>Zotero: Exchange for access token
-    Client->>Server: Retry with Bearer token
-    Server->>Client: Success!
+    User->>Client: "Save paper to GitHub"
+    Client->>MCP Server: save_paper_to_github()
+    MCP Server-->>Client: 401 Unauthorized + WWW-Authenticate
+    Client->>MCP Server: Dynamic client registration
+    MCP Server->>GitHub: OAuth authorization request (PKCE)
+    GitHub->>User: Login & consent screen
+    User->>GitHub: Approve access
+    GitHub->>MCP Server: Authorization code
+    MCP Server->>GitHub: Exchange code for access token
+    Client->>MCP Server: Retry with Bearer token
+    MCP Server->>GitHub: Create repository with paper
+    GitHub-->>MCP Server: Repository created
+    MCP Server->>Client: Success with repo URL!
 ```
 
-## Zotero Integration Code Example
+## GitHub Integration Code Example
 
 ```python
-from pyzotero import zotero
+import httpx
+from github_integration import GitHubClient, ResearchPaperRepository
 
 @mcp.tool()
-def add_paper_to_zotero(paper_id: str, collection_key: str = None):
-    """Add ArXiv paper to Zotero library"""
-    # Get paper details from ArXiv
-    paper = arxiv.Search(id_list=[paper_id]).results()[0]
+async def save_paper_to_github(paper_id: str, repo_name: str):
+    """Save ArXiv paper as GitHub repository with OAuth 2.1"""
+    # OAuth protection - triggers auth flow if needed
+    auth_header = mcp.request_context.session.get_auth_header()
+    if not auth_header:
+        raise HTTPException(
+            status_code=401,
+            headers={"WWW-Authenticate": "Bearer scope=\"repo\""}
+        )
     
-    # Initialize Zotero client (requires OAuth token)
-    zot = zotero.Zotero(
-        library_id=user_library_id,
-        library_type='user', 
-        api_key=oauth_token
+    # Get paper details from ArXiv
+    search = arxiv.Search(id_list=[paper_id])
+    paper = next(search.results())
+    
+    # Create GitHub client with OAuth token
+    token = auth_header.replace("Bearer ", "")
+    github = GitHubClient(token)
+    paper_repo = ResearchPaperRepository(github)
+    
+    # Create comprehensive repository
+    repo = await paper_repo.create_paper_repository(
+        paper_title=paper.title,
+        paper_id=paper_id,
+        authors=[author.name for author in paper.authors],
+        abstract=paper.summary,
+        pdf_url=paper.pdf_url,
+        arxiv_url=paper.entry_id,
+        categories=paper.categories,
+        published_date=paper.published.strftime('%Y-%m-%d')
     )
     
-    # Create Zotero item
-    item = {
-        'itemType': 'preprint',
-        'title': paper.title,
-        'creators': [{'name': str(author), 'creatorType': 'author'} 
-                    for author in paper.authors],
-        'abstractNote': paper.summary,
-        'url': paper.entry_id,
-        'repository': 'arXiv'
+    return {
+        "repository_url": repo.html_url,
+        "paper_title": paper.title,
+        "paper_id": paper_id
     }
-    
-    # Add to Zotero
-    return zot.create_items([item])
 ```
+
+## OAuth 2.1 + PKCE Implementation
+
+::: {.fragment}
+**Real OAuth Demo**: Complete GitHub integration with security best practices
+:::
+
+::: {.columns}
+
+::: {.column width="50%"}
+### 🔐 Security Features
+- **PKCE Protection**: Code challenge/verifier flow
+- **Dynamic Registration**: RFC 7591 compliant
+- **Scope Management**: Granular permissions
+- **Token Lifecycle**: Proper expiration handling
+:::
+
+::: {.column width="50%"}
+### 🛠️ Implementation Highlights
+- **Discovery Endpoint**: `/.well-known/oauth-authorization-server`
+- **Auto Client Registration**: No manual setup required
+- **Browser Integration**: Seamless user experience
+- **Real API Access**: GitHub repositories & gists
+:::
+
+:::
+
+::: {.fragment}
+**Demo Files**: `examples/oauth-research-server/` - Fully functional OAuth 2.1 server
+:::
 
 ## Advanced Interactive Patterns
 
@@ -363,7 +408,7 @@ Ask users for clarification when needed
 
 ::: {.column width="50%"}
 ### 🚀 What They Enable
-- **Productivity**: Google Drive, Notion, Zotero
+- **Productivity**: Google Drive, Notion, GitHub
 - **Web Search**: Brave, DuckDuckGo, Tavily
 - **Aggregators**: Zapier (1000s of integrations)
 :::
