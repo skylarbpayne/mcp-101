@@ -1,24 +1,34 @@
-# OAuth 2.1 Research Assistant MCP Server
+# MCP Research Assistant - CORRECT OAuth Implementation
 
-A complete demonstration of OAuth 2.1 + PKCE authentication with the Model Context Protocol (MCP), featuring GitHub API integration for saving research papers.
+This demonstrates the **CORRECT** MCP OAuth flow where the MCP server acts as a **Resource Server ONLY**, delegating authentication to GitHub as the Authorization Server.
 
 ## 🎯 Overview
 
-This server replaces the original Zotero integration with a proper OAuth 2.1 implementation that actually works with GitHub's API. It demonstrates:
+This implementation follows the proper MCP OAuth specification as described in the [Auth0 MCP blog post](https://auth0.com/blog/an-introduction-to-mcp-and-authorization/). It demonstrates:
 
-- ✅ **OAuth 2.1 + PKCE** - Full implementation with security best practices
-- ✅ **Dynamic Client Registration** - Automatic client setup per RFC 7591
-- ✅ **GitHub Integration** - Save papers as repositories and gists
-- ✅ **MCP OAuth Spec** - Complete MCP OAuth flow demonstration
-- ✅ **Real API Integration** - Works with actual GitHub OAuth endpoints
+- ✅ **MCP as Resource Server Only** - No OAuth AS endpoints on MCP server
+- ✅ **GitHub as Authorization Server** - Proper delegation to third-party auth
+- ✅ **Internal MCP Tokens** - Bound to GitHub sessions, not direct GitHub tokens
+- ✅ **Correct MCP OAuth Spec** - Follows the actual specification
+- ✅ **Real API Integration** - Works with actual GitHub API
+
+## 🚨 Key Differences from Wrong Implementation
+
+| Aspect | ❌ Wrong (oauth_server.py) | ✅ Correct (oauth_server_fixed.py) |
+|--------|---------------------------|-----------------------------------|
+| **MCP Server Role** | Authorization Server | Resource Server Only |
+| **OAuth Endpoints** | Implements AS endpoints | No AS endpoints |
+| **Token Type** | Returns GitHub tokens | Returns internal MCP tokens |
+| **Client Registration** | Dynamic registration | Simple browser login |
+| **User Flow** | Complex OAuth client flow | Simple redirect to GitHub |
 
 ## 🚀 Features
 
-### OAuth 2.1 Implementation
-- **Authorization Server Metadata** - RFC 8414 compliant discovery
-- **PKCE Security** - Code challenge/verifier flow for security
-- **Dynamic Registration** - Automatic client credential generation
-- **Token Management** - Access token lifecycle management
+### Correct MCP OAuth Implementation
+- **Resource Server Only** - MCP server never acts as authorization server
+- **GitHub Delegation** - All authentication handled by GitHub
+- **Internal Token Binding** - MCP tokens cryptographically bound to GitHub sessions
+- **Session Management** - Proper session lifecycle with expiration
 
 ### GitHub Integration
 - **Repository Creation** - Save papers as GitHub repositories
@@ -47,7 +57,7 @@ This server replaces the original Zotero integration with a proper OAuth 2.1 imp
 
 ## ⚙️ Configuration
 
-1. **Update OAuth Credentials** in `oauth_server.py`:
+1. **Update GitHub OAuth App Credentials** in `oauth_server_fixed.py`:
    ```python
    GITHUB_CLIENT_ID = "your_github_client_id"
    GITHUB_CLIENT_SECRET = "your_github_client_secret"
@@ -61,30 +71,30 @@ This server replaces the original Zotero integration with a proper OAuth 2.1 imp
 
 ## 🏃‍♂️ Usage
 
-### 1. Start the OAuth MCP Server
+### 1. Start the MCP Resource Server
 
 ```bash
-python oauth_server.py
+python oauth_server_fixed.py
 ```
 
-The server will start on `http://localhost:8002` with OAuth endpoints:
-- `/.well-known/oauth-authorization-server` - Discovery metadata
-- `/oauth/register` - Dynamic client registration
-- `/oauth/authorize` - Authorization endpoint
-- `/oauth/token` - Token exchange endpoint
+The server will start on `http://localhost:8002` with endpoints:
+- `/` - Server info
+- `/login/github` - GitHub login redirect (NOT an OAuth AS endpoint)
+- `/auth/callback` - GitHub OAuth callback handler
+- `/logout` - Session logout
 
-### 2. Run the Demo Client
+### 2. Run the Correct Demo Client
 
 ```bash
-python oauth_client_demo.py
+python correct_client_demo.py
 ```
 
 This will:
-1. **Register** a new OAuth client dynamically
-2. **Authorize** with GitHub via browser redirect
-3. **Connect** to the MCP server with Bearer token
+1. **Open browser** to MCP server's GitHub login page
+2. **Authenticate** with GitHub (handled by GitHub, not MCP)
+3. **Receive internal MCP token** bound to GitHub session
 4. **Search** for research papers on ArXiv
-5. **Save** papers to GitHub repositories
+5. **Save** papers to GitHub repositories using internal token
 6. **Create** research gists with notes
 
 ### 3. Manual Testing
@@ -101,7 +111,7 @@ curl -X POST http://localhost:8002/oauth/register \
   -d '{"redirect_uris": ["http://localhost:3000/callback"], "scope": "repo"}'
 ```
 
-## 🔐 OAuth Flow Sequence
+## 🔐 Correct MCP OAuth Flow Sequence
 
 ```mermaid
 sequenceDiagram
@@ -111,26 +121,31 @@ sequenceDiagram
     participant GitHub
 
     User->>Client: "Save paper to GitHub"
-    Client->>MCP Server: call save_paper_to_github()
+    Client->>MCP Server: save_paper_to_github()
     MCP Server-->>Client: 401 Unauthorized + WWW-Authenticate
     
-    Client->>MCP Server: POST /oauth/register
-    MCP Server-->>Client: client_id + client_secret
-    
-    Client->>MCP Server: GET /oauth/authorize + PKCE
+    Note over Client,MCP Server: Client opens browser to MCP login
+    Client->>MCP Server: GET /login/github
     MCP Server->>GitHub: redirect to GitHub OAuth
     GitHub->>User: Login & consent screen
     User->>GitHub: Approve access
     GitHub->>MCP Server: callback with auth code
-    MCP Server->>GitHub: exchange code for token
+    
+    Note over MCP Server,GitHub: MCP exchanges code for GitHub token
+    MCP Server->>GitHub: exchange code for access_token
     GitHub-->>MCP Server: access_token
-    MCP Server-->>Client: redirect with code
     
-    Client->>MCP Server: POST /oauth/token + PKCE verifier
-    MCP Server-->>Client: access_token
+    Note over MCP Server: MCP creates internal token bound to GitHub session
+    MCP Server->>MCP Server: create internal MCP token (JWT)
+    MCP Server-->>User: success page with internal token
     
-    Client->>MCP Server: retry API call with Bearer token
-    MCP Server->>GitHub: API call with token
+    Note over User,Client: User provides internal token to client
+    User->>Client: copy/paste internal MCP token
+    
+    Note over Client,MCP Server: Client uses internal token for API calls
+    Client->>MCP Server: retry save_paper_to_github() with internal token
+    MCP Server->>MCP Server: validate internal token, lookup GitHub session
+    MCP Server->>GitHub: API call with stored GitHub token
     GitHub-->>MCP Server: success response
     MCP Server-->>Client: operation successful
 ```
@@ -209,15 +224,16 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
-## 🌟 Key Improvements Over Original
+## 🌟 Key Improvements Over Wrong Implementation
 
-| Aspect | Original (Zotero) | New (GitHub OAuth) |
-|--------|------------------|-------------------|
-| **OAuth Support** | ❌ No OAuth | ✅ Full OAuth 2.1 + PKCE |
-| **API Compatibility** | ❌ Limited | ✅ Works with real APIs |
-| **Security** | ❌ API keys only | ✅ Proper OAuth scopes |
-| **Demo Viability** | ❌ Aspirational | ✅ Actually functional |
-| **MCP Compliance** | ❌ Partial | ✅ Complete implementation |
+| Aspect | ❌ Wrong Implementation | ✅ Correct Implementation |
+|--------|------------------------|---------------------------|
+| **MCP Server Role** | Authorization Server + Resource Server | Resource Server Only |
+| **OAuth Endpoints** | Implemented AS endpoints | No AS endpoints |
+| **Token Security** | Exposed GitHub tokens | Internal tokens only |
+| **User Experience** | Complex OAuth client flow | Simple browser login |
+| **MCP Compliance** | Violates MCP OAuth spec | Follows MCP OAuth spec |
+| **Security Model** | Client manages OAuth flow | Server manages sessions |
 
 ## 📚 References
 

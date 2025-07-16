@@ -276,15 +276,23 @@ sequenceDiagram
     
     User->>Client: "Save paper to GitHub"
     Client->>MCP Server: save_paper_to_github()
-    MCP Server-->>Client: 401 Unauthorized + WWW-Authenticate
-    Client->>MCP Server: Dynamic client registration
-    MCP Server->>GitHub: OAuth authorization request (PKCE)
+    MCP Server-->>Client: 401 Unauthorized
+    
+    Note over Client,MCP Server: Client opens browser to MCP login
+    Client->>MCP Server: GET /login/github
+    MCP Server->>GitHub: redirect to GitHub OAuth
     GitHub->>User: Login & consent screen
     User->>GitHub: Approve access
-    GitHub->>MCP Server: Authorization code
-    MCP Server->>GitHub: Exchange code for access token
-    Client->>MCP Server: Retry with Bearer token
-    MCP Server->>GitHub: Create repository with paper
+    GitHub->>MCP Server: callback with auth code
+    
+    Note over MCP Server: MCP creates internal token bound to GitHub session
+    MCP Server->>MCP Server: create internal MCP token
+    MCP Server-->>User: success page with token
+    
+    Note over User,Client: User provides internal token to client
+    User->>Client: provide internal MCP token
+    Client->>MCP Server: retry with internal token
+    MCP Server->>GitHub: API call with stored GitHub token
     GitHub-->>MCP Server: Repository created
     MCP Server->>Client: Success with repo URL!
 ```
@@ -334,34 +342,34 @@ async def save_paper_to_github(paper_id: str, repo_name: str):
     }
 ```
 
-## OAuth 2.1 + PKCE Implementation
+## Correct MCP OAuth Implementation
 
 ::: {.fragment}
-**Real OAuth Demo**: Complete GitHub integration with security best practices
+**Following MCP Spec**: MCP server as Resource Server only, delegating auth to GitHub
 :::
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-### 🔐 Security Features
-- **PKCE Protection**: Code challenge/verifier flow
-- **Dynamic Registration**: RFC 7591 compliant
-- **Scope Management**: Granular permissions
-- **Token Lifecycle**: Proper expiration handling
+### 🔐 Security Architecture
+- **Resource Server Only**: MCP never acts as authorization server
+- **GitHub Delegation**: All authentication handled by GitHub
+- **Internal Token Binding**: MCP tokens bound to GitHub sessions
+- **Session Management**: Proper token lifecycle & expiration
 :::
 
 ::: {.column width="50%"}
-### 🛠️ Implementation Highlights
-- **Discovery Endpoint**: `/.well-known/oauth-authorization-server`
-- **Auto Client Registration**: No manual setup required
-- **Browser Integration**: Seamless user experience
-- **Real API Access**: GitHub repositories & gists
+### 🛠️ Implementation Details
+- **Login Redirect**: `/login/github` (not OAuth AS endpoint)
+- **No OAuth Endpoints**: No `/.well-known`, `/oauth/*` paths
+- **Internal Tokens**: JWT tokens signed by MCP server
+- **Real API Access**: GitHub repositories & gists via stored tokens
 :::
 
 :::
 
 ::: {.fragment}
-**Demo Files**: `examples/oauth-research-server/` - Fully functional OAuth 2.1 server
+**Demo Files**: `examples/oauth-research-server/oauth_server_fixed.py` - Correct MCP OAuth
 :::
 
 ## Advanced Interactive Patterns
