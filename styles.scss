@@ -1,0 +1,67 @@
+/*-- scss:defaults --*/
+
+// fonts
+$font-family-sans-serif: "Helvetica Neue" !default;
+
+// colors
+$body-bg: #F1DEC6 !default;
+$body-color: #000 !default;
+$link-color: #4158A6 !default;
+$selection-bg: #FF8343 !default;
+$link-color-hover: #FF8343 !default;
+
+// headings
+$presentation-heading-color: #4158A6 !default;
+$presentation-heading-font: "Helvetica Neue" !default;
+$presentation-heading-text-transform: none !default;
+$presentation-heading-text-shadow: none !default;
+$presentation-h1-text-shadow: none !default;
+
+$color-p1: #4158A6;
+$color-p2: #F1DEC6;
+$color-p3: #FF8343;
+$color-s1: #4A64BD;
+$color-s2: #384C8F;
+$color-s3: #2D3D73;
+
+$primary: $color-p1 !default;
+$secondary: $color-p2 !default;
+$tertiary: $color-p3 !default;
+
+// mermaid
+$mermaid-edge-color: $color-p3;
+$mermaid-font-family: $font-family-sans-serif;
+$mermaid-label-fg-color: $color-p3;
+$mermaid-node-bg-color: rgba($color-p3, 0.1);
+$mermaid-node-fg-color: $color-p3;
+
+/*-- scss:rules --*/
+
+.reveal .special {
+    color: $primary;
+}
+
+// Table styling
+.reveal table {
+    border-collapse: collapse;
+    margin: 1em auto;
+    width: 100%;
+    font-size: 0.9em;
+}
+
+.reveal table th {
+    background-color: $color-s3;
+    color: white;
+    padding: 0.75em 1em;
+    text-align: left;
+    font-weight: bold;
+}
+
+.reveal table td {
+    padding: 0.6em 1em;
+    border-bottom: 1px solid lighten($color-p1, 40%);
+}
+
+.reveal table tr:hover {
+    background-color: rgba($color-p3, 0.2);
+}

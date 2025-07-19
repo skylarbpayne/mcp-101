@@ -1,497 +1,535 @@
 ---
 title: MCP 101
-subtitle: Building the Next Generation of Context-Aware AI Agents
+subtitle: Composable Agents with Model Context Protocol
+image: https://avatars.githubusercontent.com/u/182288589?s=48&v=4
 author: Skylar Payne
-format: revealjs
+format: 
+  revealjs:
+    theme: [beige, styles.scss]
+    footer: "MCP 101"
+    logo: "https://avatars.githubusercontent.com/u/182288589?s=48&v=4"
+    smaller: true
+    highlight-style: arrow
+    table-format:
+        hover: true
+execute:
+    enabled: false
+
 ---
 
-## The Dawn of Agentic AI {.center}
+## About the Presenter
+
+::: {.columns}
+
+::: {.column width="30%"}
+![Skylar Payne](https://skylarbpayne.com/assets/images/headshot.jpg)
+:::
+
+::: {.column width="70%"}
+**Skylar Payne**  
+
+> I'm not a career consultant. I'm a _builder_.
+
+😵‍💫 AI is hard. So many questions, options, tradeoffs. I can help.
+
+- **Decade of experience** building AI products at Google, LinkedIn, and in AI based diagnostics (healthcare)
+- **Specializes in**: helping product & engineering teams to build AI products via evaluation-driven development
+- **Philosophy**: Make it simple. Make it happen. Make it fun.
+
+Fun fact: my favorite movie is Mean Girls (I have a party for it every October 3rd).
+:::
+
+:::
+
+---
+
+## The USB-C for AI
+
 ::: {.fragment}
-**From text generation to real-world action**
+Remember the cable chaos before USB-C?
+:::
+
+::: {.columns}
+
+::: {.column width="50%"}
+:::{.special}
+**Before USB-C**
+:::
+
+- **Different cables** for every device
+- **Proprietary connectors** everywhere
+- **Vendor lock-in** and incompatibility
+- **Consumer frustration**
+:::
+
+::: {.column width="50%"}
+:::{.special}
+**After USB-C**
+:::
+
+- **Universal connector** for all devices
+- **One cable** to rule them all
+- **Interoperability** across vendors
+- **Innovation acceleration**
+:::
+
+:::
+
+---
+
+## The AI Integration Problem
+
+::: {.columns}
+
+::: {.column width="50%"}
+:::{.special}
+**Today's Reality**
+:::
+
+- Every AI app builds custom integrations
+- Fragmented, brittle connections
+- Developers reinvent the wheel
+:::
+
+::: {.column width="50%"}
+:::{.special}
+**The MCP Vision**
+:::
+
+- **Standard protocol** for AI integrations
+- **Build once, use everywhere**
+- **Composable ecosystem**
+:::
+
 :::
 
 ::: {.fragment}
+**Result**: Focus on value, not plumbing
+:::
+
+---
+
+## MCP Architecture
+
 ```{mermaid}
 graph TB
-    A["🧠 Traditional LLM<br/>Text Generator"] 
-    B["🤖 Agentic AI<br/>Action Taker"]
+    subgraph "Host Applications"
+        A[Claude Desktop]
+        B[VS Code + Cursor]
+        C[Your AI App]
+    end
     
-    A --> C["📝 Email Drafts"]
-    A --> D["💭 Ideas"]
+    subgraph "MCP Clients"
+        D[Client 1]
+        E[Client 2]
+        F[Client 3]
+    end
     
-    B --> E["🔍 Research"]
-    B --> F["⚙️ Tool Use"]
-    B --> G["🎯 Goal Achievement"]
+    subgraph "MCP Servers"
+        G[GitHub Server]
+        H[Database Server]
+        I[File System Server]
+        J[Your Custom Server]
+    end
     
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style B fill:#9f9,stroke:#333,stroke-width:2px
+    A --> D
+    B --> E
+    C --> F
+    
+    D --> G
+    E --> H
+    F --> I
+    F --> J
 ```
-:::
+
+One server works with any MCP-compatible host!
+
+---
+
+## The Three Primitives
+
+| Primitive | Purpose | Example |
+|-----------|---------|---------|
+| **Resources** | Read-only data | ArXiv paper abstracts |
+| **Tools** | Actions with side effects | Create GitHub Gist |
+| **Prompts** | Workflow templates | Research assistant workflow |
+
 
 ::: {.fragment}
-**The paradigm shift:**  
-Passive content creation → Active problem-solving
+**Simple but powerful**: Everything an AI agent needs
 :::
 
-## The Context Gap Problem {.center}
+---
 
-::: {.fragment}
-**LLMs are "incredibly smart in a vacuum"** 🎈
-:::
+### Demo: Research Assistant
 
 ::: {.columns}
 
-::: {.column width="45%"}
-### 🚧 The Challenges
-
-- **⏳ Knowledge Cutoff**: Frozen training data  
-- **🏝️ Data Silos**: No access to private/real-time data  
-- **🕸️ N×M Integration**: Every model needs custom connections  
+::: {.column width="50%"}
+:::{.special}
+**What It Does**
 :::
 
-::: {.column width="45%" .mb-4}
-### 💥 The Impact
-
-- 📉 80% of AI projects fail (RAND Corp, 2024)  
-- 🧩 Complex "context engineering" required  
-- 🔒 Vendor lock-in and brittle integrations  
+1. **Search** ArXiv for papers
+2. **Analyze** abstracts and content
+3. **Synthesize** research findings
+4. **Create** structured GitHub Gist
 :::
 
+::: {.column width="50%"}
+:::{.special}
+**MCP Components**
 :::
 
-## MCP: The USB-C for AI {.center}
+- **ArXiv MCP Server** (external tool)
+- **GitHub Gist Server** (custom)
+- **Mirascope Client** (host)
+- **Server composition** with FastMCP
+:::
 
-| Aspect | Traditional (N×M) | MCP Standard |
-|--------|------------------|--------------|
-| **Integration Effort** | High: Custom code for each pair | Low: One server, any client |
-| **Discoverability** | Manual documentation reading | Automated runtime reflection |
-| **Interoperability** | Vendor-locked | Model-agnostic open standard |
-| **Security** | Ad-hoc API key management | OAuth 2.1, scopes, consent |
-| **Scalability** | Poor: N×M complexity | Excellent: N+M complexity |
-
-## MCP Architecture {.center}
-
-```{mermaid}
-graph TD
-    A[MCP Host<br/>Claude Desktop, Cursor IDE] --> B[MCP Client 1]
-    A --> C[MCP Client 2]
-    A --> D[MCP Client N]
-    B --> E[OAuth Research Server]
-    C --> F[GitHub Server]
-    D --> G[Database Server]
-    
-    style A fill:#e1f5fe
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style G fill:#f3e5f5
-```
-
-- **Host**: User-facing application
-- **Client**: Manages connections (1:1 with servers)
-- **Server**: Exposes specific capabilities via JSON-RPC 2.0
-
-## Our Demo: AI Research Assistant {.center}
-
-::: {.fragment}
-**Goal**: Build an agent that finds, analyzes, and manages academic papers
 :::
 
 ::: {.fragment}
-### Implementation Plan
+**Demo time!** Let's see it in action
 :::
 
-::: {.incremental}
-1. **Scaffold**: Basic OAuth server with GitHub integration
-2. **Expand**: Add Tools, Resources, and Prompts
-3. **Enhance**: OAuth 2.1 + PKCE authentication
-4. **Secure**: Protected tools requiring GitHub OAuth
-5. **Advanced**: Token management and dynamic client registration
-:::
+---
 
-## Demo Time! {.center}
+## Step 1: Server Composition
 
-::: {.fragment}
-**Let's see our OAuth Research Assistant in action**
-:::
+From `demo/server.py`:
 
-::: {.fragment}
-1. Register OAuth client with MCP server
-2. Authenticate with GitHub via OAuth 2.1 + PKCE
-3. Save research papers to GitHub repositories
-4. List and manage research repositories
-:::
-
-## Step 1: OAuth Research Server Setup
-
-::: {.columns}
-
-::: {.column width="40%"}
-### Setup
-```bash
-# Set GitHub OAuth credentials
-export GITHUB_CLIENT_ID="your_id"
-export GITHUB_CLIENT_SECRET="your_secret"
-
-# Install dependencies
-pip install -r requirements.txt
-```
-:::
-
-::: {.column width="60%"}
-### OAuth Server
 ```python
-from fastapi import HTTPException
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
+from gist_mcp import mcp as gist_mcp
+import uvicorn
 
-mcp = FastMCP("OAuth Research Server")
-
-@mcp.get("/.well-known/oauth-authorization-server")
-async def oauth_metadata():
-    return {
-        "authorization_endpoint": "http://localhost:8002/oauth/authorize",
-        "token_endpoint": "http://localhost:8002/oauth/token"
+# Proxy to external ArXiv MCP server
+arxiv_mcp = FastMCP.as_proxy({
+    "mcpServers": {
+        "arxiv-mcp-server": {
+            "command": "uv",
+            "args": [
+                "tool", "run", "arxiv-mcp-server",
+                "--storage-path", ".tmp/arxiv-mcp-server"
+            ]
+        }
     }
+})
 
-@mcp.tool()
-async def save_paper_to_github(paper_title: str, repo_name: str):
-    """Save research paper to GitHub (OAuth required)"""
-    auth_context = get_auth_context()
-    if not auth_context.get("bearer"):
-        raise HTTPException(status_code=401, detail="OAuth required")
-    
-    # Create GitHub repository with OAuth token
-    return {"status": "saved", "repo_url": f"https://github.com/user/{repo_name}"}
+# Main server combining capabilities
+mcp = FastMCP("My MCP Server")
+mcp.mount(arxiv_mcp)  # ArXiv search
+mcp.mount(gist_mcp)   # Gist creation
 
-mcp.run(transport="http", port=8002)
-```
-:::
-
-:::
-
-::: {.fragment}
-**Run and test**: `python oauth_server.py`
-:::
-
-## OAuth 2.1 Flow Implementation
-
-```{mermaid}
-sequenceDiagram
-    participant Client as MCP Client
-    participant Server as OAuth Server
-    participant GitHub as GitHub OAuth
-    participant API as GitHub API
-
-    Client->>Server: 1. Register Client (Dynamic)
-    Server-->>Client: Client ID & Secret
-    
-    Client->>Server: 2. Request Authorization
-    Server->>GitHub: 3. Redirect to GitHub OAuth
-    GitHub->>Server: 4. Authorization Code
-    Server->>GitHub: 5. Exchange Code for Token
-    GitHub-->>Server: GitHub Access Token
-    Server-->>Client: 6. MCP Access Token
-    
-    Client->>Server: 7. Call Protected Tool
-    Note over Server: Bearer Token Required
-    Server->>API: 8. GitHub API Call
-    API-->>Server: Repository Created
-    Server-->>Client: Success Response
+if __name__ == "__main__":
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=8000)
 ```
 
-## MCP's Three Core Primitives {.center}
+---
 
-| Primitive | Purpose | Analogy | Example |
-|-----------|---------|---------|---------|
-| **Tools** | Executable actions with side effects | POST Request | `save_paper_to_github(title, repo_name)` |
-| **Resources** | Read-only, file-like data | GET Request | `github/repos/{repo_name}/readme` |
-| **Prompts** | Reusable workflow templates | Workflow | "OAuth Paper Management" |
+## Step 2: Custom Gist Server
 
-::: {.fragment}
-**Benefits**: Clear separation of concerns, better security, predictable behavior
-:::
-
-## Code Demo: Setup & Models
+From `demo/gist_mcp.py`:
 
 ```python
-from mcp.server.fastmcp import FastMCP
-from fastapi import HTTPException
 import httpx
-from pydantic import BaseModel
+import os
+from fastmcp import FastMCP
 
-mcp = FastMCP("OAuth Research Server")
+GITHUB_TOKEN = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
+mcp = FastMCP("Gist Creator")
 
-class GitHubRepository(BaseModel):
-    name: str
-    full_name: str
-    description: str
-    html_url: str
-    created_at: str
-```
-
-## Code Demo: Tools Implementation
-
-```python
-@mcp.tool()
-async def save_paper_to_github(paper_title: str, repo_name: str):
-    """Save research paper to GitHub (OAuth required)"""
-    auth_context = get_auth_context()
-    if not auth_context.get("bearer"):
-        raise HTTPException(status_code=401, detail="OAuth required")
-    
-    # Use GitHub API with OAuth token
-    token_info = access_tokens[auth_context["bearer"]]
-    github_token = token_info["github_token"]
-    
-    # Create repository via GitHub API
-    return {"status": "saved", "repo_url": f"https://github.com/user/{repo_name}"}
-```
-
-## Code Demo: Resources Implementation
-
-```python
-@mcp.resource("github/repos/{repo_name}/readme")
-async def get_repo_readme(repo_name: str) -> str:
-    """Get repository README (OAuth required)"""
-    auth_context = get_auth_context()
-    if not auth_context.get("bearer"):
-        raise HTTPException(status_code=401, detail="OAuth required")
-    
-    # Fetch README from GitHub API
-    github_token = access_tokens[auth_context["bearer"]]["github_token"]
-    
+@mcp.tool(
+    name="create_gist",
+    description="Create a GitHub Gist using the configured personal access token.",
+)
+async def create_github_gist(title: str, body: str, description: str = "", public: bool = True):
+    url = "https://api.github.com/gists"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    payload = {
+        "description": description,
+        "public": public,
+        "files": {title: {"content": body}}
+    }
     async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"https://api.github.com/repos/{repo_name}/readme",
-            headers={"Authorization": f"Bearer {github_token}"}
-        )
-        return response.json()["content"]
+        response = await client.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return response.json()
 ```
 
-::: {.fragment}
-**Full implementation**: See `examples/oauth-research-server/oauth_server.py`
-:::
+---
 
-## Enhanced UX: Progress Tracking
+## Step 3: AI Agent Client
 
-**Problem**: Long-running operations need user feedback
-
-**Solution**: MCP's built-in notification system
+From `demo/client.py`:
 
 ```python
-@mcp.tool()
-def download_papers(paper_ids: list[str], progress_token: str):
-    """Download multiple papers with progress tracking"""
-    total = len(paper_ids)
-    
-    for i, paper_id in enumerate(paper_ids):
-        # Send progress notification
-        mcp.request_context.session.send_progress_notification(
-            progress_token=progress_token,
-            progress=i + 1,
-            total=total,
-            message=f"Downloading paper {i + 1} of {total}..."
-        )
-        
-        # Download paper
-        download_single_paper(paper_id)
+from mirascope import llm, prompt_template
+from mirascope.mcp import sse_client
+
+@llm.call(provider="openai", model="gpt-4.1-mini")
+@prompt_template("""
+SYSTEM: You are a helpful research assistant.
+You use arxiv search tools to search for papers to answer the user's question.
+You always write your findings in a structured format to a github gist when you are done.
+Remember: you MUST create a github gist.
+
+USER: {query}
+MESSAGES: {history}  
+""")
+async def mini_research(query: str, *, history=None): ...
+
+async def main():
+    async with sse_client("http://localhost:8000/sse") as client:
+        tools = await client.list_tools()
+        resp = await run(query, tools=tools)
 ```
-## Security: OAuth 2.1 Authentication
+
+---
+
+## Step 4: Agent Loop
+
+Key parts from `demo/client.py`:
+
+```python
+async def _process_tools(resp):
+    """Process tool calls asynchronously for efficiency."""
+    if tools := resp.tools:
+        for t in tools: print('Calling', t._name())
+        tasks = [t.call() for t in tools]
+        tool_results = await asyncio.gather(*tasks)
+        return list(zip(tools, tool_results))
+    return None
+
+async def run(query: str, *, tools, max_steps: int = 10):
+    """Main agent loop: continue until done or max steps reached."""
+    done, history, i = False, [], 0
+    while not done and i < max_steps:
+        resp, history, done = await _one_step(query, tools=tools, history=history)
+        i += 1
+    return resp
+```
+
+---
+
+## Running the Demo
+
+Simple setup:
+
+```bash
+# Set your GitHub token
+export GITHUB_PERSONAL_ACCESS_TOKEN="your_token_here"
+
+# Run the server
+uv run demo/server.py
+
+# In another terminal, run the client
+uv run demo/client.py
+```
 
 ::: {.fragment}
-**Challenge**: Access private Zotero library safely
+**Try it**: "Research recent advances in transformer architecture optimization"
 :::
+
+---
+
+## MCP Transports
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-### Traditional OAuth Pain
-- Manual app registration
-- Copy-paste client credentials
-- N×M authentication problem
+:::{.special}
+**STDIO Transport**
+:::
+
+- Local processes
+- Direct process communication
+- Great for tools, scripts, local files
 :::
 
 ::: {.column width="50%"}
-### MCP Innovation
-- **Dynamic Client Registration**
-- Automatic endpoint discovery
-- One-click user consent
-- PKCE security protection
+:::{.special}
+**HTTP Transport**
+:::
+
+- Remote services
+- Scalable web services
+- Enterprise deployments
 :::
 
 :::
 
 ::: {.fragment}
-**Result**: Most secure path is also the easiest path
+**SSE (Server-Sent Events)**: Deprecated but still used by some host applications like Mirascope
 :::
 
-## Authentication Flow
+---
+
+## Security Best Practices
+
+::: {.columns}
+
+::: {.column width="50%"}
+:::{.special}
+**Environment Variables**
+:::
+
+- Never hardcode secrets
+- Use `.env` files for development
+- Proper secret management in production
+:::
+
+::: {.column width="50%"}
+:::{.special}
+**User Consent**
+:::
+
+- Show users what actions will be taken
+- Clear tool descriptions
+- Explicit permission flows
+:::
+
+:::
+
+::: {.fragment}
+**Coming Soon**: Support for OAuth flows for enterprise deployment support
+:::
+
+---
+
+## Advanced MCP Features
+
+- **Sampling**: Servers can request LLM calls from hosts
+- **Progress Notifications**: Real-time updates for long operations  
+- **Elicitation**: Request more information from host application
+- **Resource Templates**: Dynamic resource paths with parameters
+- **Context Objects**: Rich integration with host capabilities
+- **Authorization**: Enterprise OAuth flows
+
+::: {.fragment}
+**These unlock sophisticated multi-agent workflows**
+:::
+
+---
+
+## Extending Our Demo
+
+::: {.columns}
+
+::: {.column width="50%"}
+:::{.special}
+**Add PDF Processing**
+:::
+
+- Download full papers
+- Extract and summarize text
+- Include detailed analysis in gist
+
+:::{.special}
+**Web Search Integration**
+:::
+
+- Find related discussions
+- Check for implementations
+- Add broader context
+:::
+
+::: {.column width="50%"}
+:::{.special}
+**Private Knowledge**
+:::
+
+- Search Obsidian notes
+- Access company research
+- Connect to internal databases
+
+:::{.special}
+**Multi-Modal Analysis**
+:::
+
+- Process paper figures
+- Analyze charts and graphs
+- Generate visual summaries
+:::
+
+:::
+
+---
+
+## The Composable Future
 
 ```{mermaid}
-sequenceDiagram
-    participant User
-    participant Client
-    participant Server
-    participant Zotero
+graph LR
+    A[ArXiv Server] --> D[Research Agent]
+    B[PDF Server] --> D
+    C[Gist Server] --> D
+    E[Web Search] --> D
+    F[Obsidian] --> D
     
-    User->>Client: "Save paper to Zotero"
-    Client->>Server: add_paper_to_collection()
-    Server-->>Client: 401 Unauthorized
-    Client->>Zotero: OAuth authorization request
-    Zotero->>User: Login & consent screen
-    User->>Zotero: Approve access
-    Zotero->>Client: Authorization code
-    Client->>Zotero: Exchange for access token
-    Client->>Server: Retry with Bearer token
-    Server->>Client: Success!
+    D --> G[Comprehensive Research Reports]
 ```
 
-## Zotero Integration Code Example
+::: {.fragment}
+**Mix and match servers** to create powerful, specialized agents
+:::
 
-```python
-from pyzotero import zotero
+---
 
-@mcp.tool()
-def add_paper_to_zotero(paper_id: str, collection_key: str = None):
-    """Add ArXiv paper to Zotero library"""
-    # Get paper details from ArXiv
-    paper = arxiv.Search(id_list=[paper_id]).results()[0]
-    
-    # Initialize Zotero client (requires OAuth token)
-    zot = zotero.Zotero(
-        library_id=user_library_id,
-        library_type='user', 
-        api_key=oauth_token
-    )
-    
-    # Create Zotero item
-    item = {
-        'itemType': 'preprint',
-        'title': paper.title,
-        'creators': [{'name': str(author), 'creatorType': 'author'} 
-                    for author in paper.authors],
-        'abstractNote': paper.summary,
-        'url': paper.entry_id,
-        'repository': 'arXiv'
-    }
-    
-    # Add to Zotero
-    return zot.create_items([item])
-```
-
-## Advanced Interactive Patterns
+## Getting Started
 
 ::: {.columns}
 
-::: {.column width="50%"}
-::: {style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;"}
-### 🗣️ Elicitation
-
-Ask users for clarification when needed
-
-**Example**: "Which 'transformers'?"  
-- AI models or electrical engineering?
-:::
+::: {.column width="50%" .mb-4}
+:::{.special}
+**Resources**
 :::
 
-::: {.column width="50%"}
-::: {style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;"}
-### 🔒 Security Features
-
-- **Roots**: Filesystem boundaries  
-- **Sampling**: Server can request LLM help  
-- **Scopes**: Granular permissions
-:::
+- **MCP Specification**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **FastMCP**: Python framework
+- **200+ existing servers**: Ready to use
+- **MCP Inspector**: Debug tool
 :::
 
+::: {.column width="50%" .mb-4}
+:::{.special}
+**Next Steps**
 :::
 
-::: {.fragment}
-**Key benefit**: Human-in-the-loop workflows with graceful ambiguity handling
-:::
-
-## The Growing MCP Ecosystem
-
-::: {.columns}
-
-::: {.column width="50%"}
-### 🛠️ Popular Categories
-- **Developer Tools**: GitHub, GitLab, Docker
-- **Databases**: PostgreSQL, Redis, Vector DBs  
-- **Communication**: Slack, Gmail, Teams
-:::
-
-::: {.column width="50%"}
-### 🚀 What They Enable
-- **Productivity**: Google Drive, Notion, Zotero
-- **Web Search**: Brave, DuckDuckGo, Tavily
-- **Aggregators**: Zapier (1000s of integrations)
+1. **Try the demo** in this repo
+2. **Pick a daily tool** to wrap
+3. **Build your MCP server**
+4. **Share with community**
 :::
 
 :::
 
-::: {.fragment}
-**200+ servers and growing** - Build once, use everywhere
-:::
+---
 
-## Getting Started: Developer Resources
+## Questions & Discussion
 
-::: {.columns}
-
-::: {.column width="50%"}
-### Essential Resources
-- **Official Docs**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- **Protocol Spec**: Complete technical specification
-- **SDKs**: Python, TypeScript, Java, C#, Go
-- **MCP Inspector**: Interactive debugging tool
-:::
-
-::: {.column width="50%"}
-### Learning & Community
-- **DeepLearning.AI Course**: [Build Rich-Context AI Apps](https://www.deeplearning.ai/short-courses/mcp-build-rich-context-ai-apps-with-anthropic/)
-- **awesome-mcp-servers**: [GitHub Collection](https://github.com/punkpeye/awesome-mcp-servers)
-- **Community**: [MCP Servers Directory](https://mcpservers.org)
-- **Quick Start**: Build your first server in minutes
-:::
-
-:::
-
-## The Future is Composable {.center}
-
-::: {.fragment}
-**MCP resolves the critical context gap**
-:::
-
-::: {.fragment}
-- **Universal language** for AI integration
-- **Composable agents** working in concert
-- **Network effects** drive rapid ecosystem growth
-:::
-
-::: {.fragment}
-### Your Next Steps
-1. **Identify** a tool you use daily
-2. **Build** a simple MCP server for it
-3. **Contribute** to the growing ecosystem
-4. **Unlock** its potential for all AI applications
-:::
-
-::: {.fragment}
-**The time to start building is now.**
-:::
-
-## Questions & Discussion {.center}
-
-::: {.fragment}
 **Thank you!**
+
+- **Demo Code**: This repository `/demo` folder
+- **MCP Docs**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **FastMCP**: High-level Python development
+
+:::{.columns}
+
+:::{.column width="50%"}
+:::{.special}
+**Sign up for my newsletter!**
 :::
 
-::: {.fragment}
-### Resources
-- **Demo Code**: Available in this repository
-- **Documentation**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- **Community**: [MCP Servers Directory](https://mcpservers.org)
+![](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://subscribe.skylarbpayne.com)
 :::
 
-::: {.fragment}
-*Let's build the future of AI together.*
+:::{.column width="50%"}
+:::{.special}
+**Github Repo**
+:::
+
+![](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/skylarbpayne/mcp-101)
+:::
+
 :::
