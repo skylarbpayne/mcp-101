@@ -1,14 +1,12 @@
 {
   "name": "MCP 101",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "features": {
-    "ghcr.io/astral-sh/uv/uv:latest": {},
-    "ghcr.io/devcontainers-contrib/features/quarto-cli:2": {}
+    "ghcr.io/va-h/devcontainers-features/uv:latest": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "quarto.quarto",
         "ms-python.python",
         "ms-python.pylint",
         "ms-python.black-formatter"
@@ -16,11 +14,4 @@
     }
   },
   "postCreateCommand": "uv sync",
-  "forwardPorts": [8080],
-  "portsAttributes": {
-    "8080": {
-      "label": "Quarto Preview",
-      "onAutoForward": "notify"
-    }
-  }
 }
