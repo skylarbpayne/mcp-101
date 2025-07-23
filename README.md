@@ -32,10 +32,10 @@ quarto preview
    uv sync
 
    # Start the MCP server
-   uv run python demo/server.py
+   uv run demo/server.py
 
    # In another terminal, run the client
-   uv run python demo/client.py
+   uv run demo/client.py
    ```
 
 ### GitHub Personal Access Token Setup

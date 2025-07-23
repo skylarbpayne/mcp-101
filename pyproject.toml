@@ -27,3 +27,6 @@ dependencies = [
 dev = [
     "ipdb>=0.13.13",
 ]
+
+[tool.setuptools]
+packages = ["demo"]
