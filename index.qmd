@@ -505,7 +505,7 @@ graph LR
 **Sign up for my newsletter!**
 :::
 
-![](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://subscribe.skylarbpayne.com)
+![](assets/newsletter-qr.png)
 :::
 
 :::{.column width="50%"}
