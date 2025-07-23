@@ -1,12 +1,11 @@
 ---
-title: MCP 101
-subtitle: Composable Agents with Model Context Protocol
+title: Everything You Always Wanted to Know About MCP
+subtitle: But Were Afraid to Ask
 image: https://avatars.githubusercontent.com/u/182288589?s=48&v=4
 author: Skylar Payne
 format: 
   revealjs:
     theme: [beige, styles.scss]
-    footer: "MCP 101"
     logo: "https://avatars.githubusercontent.com/u/182288589?s=48&v=4"
     smaller: true
     highlight-style: arrow
@@ -17,7 +16,7 @@ execute:
 
 ---
 
-## About the Presenter
+## About Me
 
 ::: {.columns}
 
@@ -26,19 +25,28 @@ execute:
 :::
 
 ::: {.column width="70%"}
-**Skylar Payne**  
-
-> I'm not a career consultant. I'm a _builder_.
-
-😵‍💫 AI is hard. So many questions, options, tradeoffs. I can help.
-
-- **Decade of experience** building AI products at Google, LinkedIn, and in AI based diagnostics (healthcare)
-- **Specializes in**: helping product & engineering teams to build AI products via evaluation-driven development
-- **Philosophy**: Make it simple. Make it happen. Make it fun.
-
-Fun fact: my favorite movie is Mean Girls (I have a party for it every October 3rd).
+:::{.special}
+Empowering **you** to build AI products users **love**.  
+And permanently ditch those 3 AM debugging sessions.
 :::
 
+- Building AI products for **over a decade** at Google, LinkedIn, and in AI based diagnostics (healthcare)
+- Trained **over 100 engineers** to build AI products
+- Hands on executive experience building the teams that build AI products
+
+**Fun fact**: my favorite movie is Mean Girls (I have a party for it every October 3rd).
+
+<div class="tenor-gif-embed" data-postid="4135521" data-share-method="host" data-aspect-ratio="1.77778" data-width="30%"><a href="https://tenor.com/view/so-fetch-mean-girls-fetch-trending-look-good-gif-4135521">So Fetch GIF</a>from <a href="https://tenor.com/search/so+fetch-gifs">So Fetch GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+:::
+
+:::
+
+---
+
+## So... What _is_ MCP, really?
+
+:::{.fragment}
+![](assets/bird_plane_mcp.png)
 :::
 
 ---
@@ -75,6 +83,10 @@ Remember the cable chaos before USB-C?
 
 :::
 
+:::{.fragment}
+<img src="assets/many_cables.jpg" width="30%" />
+:::
+
 ---
 
 ## The AI Integration Problem
@@ -105,6 +117,8 @@ Remember the cable chaos before USB-C?
 
 ::: {.fragment}
 **Result**: Focus on value, not plumbing
+
+<img src="assets/mcp.webp" width="30%" />
 :::
 
 ---
@@ -146,7 +160,7 @@ One server works with any MCP-compatible host!
 
 ---
 
-## The Three Primitives
+## Three Core Primitives
 
 | Primitive | Purpose | Example |
 |-----------|---------|---------|
@@ -472,36 +486,6 @@ graph LR
 
 ::: {.fragment}
 **Mix and match servers** to create powerful, specialized agents
-:::
-
----
-
-## Getting Started
-
-::: {.columns}
-
-::: {.column width="50%" .mb-4}
-:::{.special}
-**Resources**
-:::
-
-- **MCP Specification**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- **FastMCP**: Python framework
-- **200+ existing servers**: Ready to use
-- **MCP Inspector**: Debug tool
-:::
-
-::: {.column width="50%" .mb-4}
-:::{.special}
-**Next Steps**
-:::
-
-1. **Try the demo** in this repo
-2. **Pick a daily tool** to wrap
-3. **Build your MCP server**
-4. **Share with community**
-:::
-
 :::
 
 ---
