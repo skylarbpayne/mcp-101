@@ -496,7 +496,8 @@ graph LR
 
 - **Demo Code**: This repository `/demo` folder
 - **MCP Docs**: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- **FastMCP**: High-level Python development
+- **FastMCP**: [High-level Python development of MCP clients/servers](https://gofastmcp.com/getting-started/welcome)
+- **MCP Github**: [base implementations of MCP protocol in multiple languages](https://github.com/modelcontextprotocol)
 
 :::{.columns}
 
