@@ -9,9 +9,28 @@ load_dotenv()
 
 @llm.call(provider="openai", model="gpt-4.1-mini")
 @prompt_template("""
+SYSTEM: You are a helpful research assistant. You are given a paper ID and you need to summarize the paper.
+Use the ReadPaper tool to read the paper, and then summarize it.
+
+USER: Please summarize the following paper:\n{paper_content}                 
+""")
+def summarize_paper(paper_content: str):
+    """Summarize a paper from arXiv given it's paper ID"""
+    ...
+
+
+@llm.call(provider="openai", model="gpt-4.1-mini")
+@prompt_template("""
 SYSTEM: You are a helpful research assistant.
 You use arxiv search tools to search for papers to answer the user's question.
 You always write your findings in a structured format to a github gist when you are done.
+
+You should follow the following process:
+1. Execute Arxiv Search Tool to find relevant papers
+2. For each paper, use the ReadPaper tool to read the paper
+3. Summarize each paper using the Summarize Paper Tool
+4. Create a github gist with the summary of the research
+
 Remember: you MUST create a github gist.
 
 <report_format>
@@ -21,7 +40,7 @@ Remember: you MUST create a github gist.
 
 ## Summary of Work
                  
-[[Summary of paper abstracts found]]
+[[Summary of papers found]]
 
 ## Papers
                  
@@ -34,6 +53,12 @@ MESSAGES: {history}
 """)
 async def mini_research(query: str, *, history: list[Messages.Type] | None = None): ...
 
+async def _try_tool_call(tool):
+    try:
+        return await tool.call()
+    except Exception as e:
+        return "Error calling {tool._name()}: {e}"
+        
 
 async def _process_tools(resp):
     """process the tool calls.
@@ -44,10 +69,11 @@ async def _process_tools(resp):
     """
     if tools := resp.tools:
         for t in tools: print('Calling', t._name()) # noqa: E701
-        tasks = [t.call() for t in tools]
+        tasks = [_try_tool_call(t) for t in tools]
         tool_results = await asyncio.gather(*tasks)
         return list(zip(tools, tool_results))
     return None
+
 
 
 async def _one_step(query: str, tools, history: list[Messages.Type] | None = None):
@@ -56,7 +82,8 @@ async def _one_step(query: str, tools, history: list[Messages.Type] | None = Non
     The core step for an agent is get a response from the core llm which may contain tools.
     If there are tools, we call and process them.
     """
-    resp = await llm.override(mini_research, tools=tools)(query, history=history)
+    tools = [t for t in tools if 'Download' not in t._name()]
+    resp = await llm.override(mini_research, tools=tools + [summarize_paper])(query, history=history)
     history.append(resp.message_param)
     tool_calls = await _process_tools(resp)
     if tool_calls:

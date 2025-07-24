@@ -427,6 +427,34 @@ uv run demo/client.py
 
 ---
 
+## Why not _just_ tools?
+
+You might be thinking: why do we need to go through all this trouble? Why not just use simple cli tools?
+
+:::{.fragment}
+Or maybe... Should I *always* use MCP?
+:::
+
+:::{.fragment}
+<br>
+**It Depends.**
+:::
+
+:::{.fragment}
+<br>
+
+- Standardized interfaces (like MCP) provide leverage: common logging, auth, metrics, etc.
+- CLI tools often work great in many cases too!
+:::
+
+:::{.fragment}
+<br>
+In short: use MCP servers off the shelf when it makes sense. Also use off the shelf simple tools when it makes sense.  
+When you have need for standardized control (for logging, metrics, auth) etc, you might want to force all MCP use
+:::
+
+---
+
 ## Extending Our Demo
 
 ::: {.columns}
